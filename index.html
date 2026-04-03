@@ -2,95 +2,64 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Fullscreen Inline SVG Slider</title>
+<title>SVG Fullscreen Slider</title>
 <style>
+  /* Tam ekran için body ve html */
   html, body {
-    margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
-    background-color: #000; display: flex; justify-content: center; align-items: center;
-  }
-
-  #slider {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-  }
-
-  .slide {
-    position: absolute;
+    margin: 0;
+    padding: 0;
     width: 100%;
     height: 100%;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000; /* Arkaplan siyah, istersen değiştir */
   }
 
-  .slide.active {
-    opacity: 1;
+  /* Slider container tam ekran */
+  #slider {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
-  /* Örnek efektler */
-  .fade { opacity: 0; }
-  .fade.active { opacity: 1; }
-
-  .slide-left { transform: translateX(100%); opacity: 0; }
-  .slide-left.active { transform: translateX(0); opacity: 1; transition: all 1s ease-in-out; }
-
-  .zoom { transform: scale(0.5); opacity: 0; }
-  .zoom.active { transform: scale(1); opacity: 1; transition: all 1s ease-in-out; }
+  /* SVG img tam ekrana sığacak şekilde */
+  #slider img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Bozulmadan ölçekleme */
+  }
 </style>
 </head>
 <body>
 
-<div id="slider"></div>
+<div id="slider">
+  <img id="slide" src="" alt="SVG Slideshow">
+</div>
 
 <script>
-  const svgUrls = [
+  // SVG raw linklerini buraya ekle
+  let images = [
     "slide1.svg",
     "slide2.svg",
     "slide3.svg"
   ];
 
-  const slideDurations = [2000, 5000, 3000]; // ms
-  const slideEffects = ["fade", "slide-left", "zoom"];
+  let index = 0;
 
-  const slider = document.getElementById("slider");
-  let slides = [];
-  let currentIndex = 0;
-  let timeoutId;
-
-  // SVG'leri fetch ile alıp inline ekle
-  svgUrls.forEach(async (url, i) => {
-    const res = await fetch(url);
-    let svgText = await res.text();
-
-    const div = document.createElement("div");
-    div.classList.add("slide", slideEffects[i]);
-    div.innerHTML = svgText; // SVG inline ekleniyor
-    if(i === 0) div.classList.add("active");
-
-    slider.appendChild(div);
-    slides.push(div);
-  });
-
-  function showSlide(index){
-    slides.forEach((slide, i) => {
-      slide.classList.remove("active");
-      if(i === index) slide.classList.add("active");
-    });
-    currentIndex = index;
-
-    clearTimeout(timeoutId);
-    let next = currentIndex + 1;
-    if(next >= slides.length) next = 0;
-    timeoutId = setTimeout(() => showSlide(next), slideDurations[currentIndex]);
+  function slideShow(){
+    document.getElementById("slide").src = images[index];
+    index++;
+    if(index >= images.length){
+      index = 0;
+    }
   }
 
-  // SVG’lerin yüklenmesini bekleyip başlat
-  const waitForSlides = setInterval(() => {
-    if(slides.length === svgUrls.length){
-      clearInterval(waitForSlides);
-      showSlide(0);
-    }
-  }, 100);
+  setInterval(slideShow, 5000); // 2 saniye arayla geçiş
+  slideShow(); // Başlangıçta ilk resmi göster
 </script>
 
 </body>
