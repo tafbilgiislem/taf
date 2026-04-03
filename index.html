@@ -2,30 +2,21 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Fullscreen Inline SVG Slider - Repo İçi</title>
+<title>Fullscreen SVG Slider - Object</title>
 <style>
   html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    background-color: #000; display: flex; justify-content: center; align-items: center;
     overflow: hidden;
-    background-color: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
 
   #slider {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
+    position: relative; width: 100vw; height: 100vh;
   }
 
   .slide {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     opacity: 0;
     transition: all 1s ease-in-out;
   }
@@ -34,7 +25,7 @@
     opacity: 1;
   }
 
-  /* Farklı geçiş efektleri */
+  /* Farklı efektler */
   .fade { opacity: 0; }
   .fade.active { opacity: 1; }
 
@@ -50,62 +41,40 @@
 <div id="slider"></div>
 
 <script>
-  // SVG dosyaları index.html ile aynı klasörde
-  const svgFiles = [
-    "slide1.svg",
-    "slide2.svg",
-    "slide3.svg"
-  ];
-
-  // Her slaytın geçiş süresi (ms)
-  const slideDurations = [3000, 5000, 4000]; 
-
-  // Her slaytın geçiş efekti
-  const slideEffects = ["fade", "slide-left", "zoom"];
+  const svgFiles = ["1.svg","2.svg","3.svg"];
+  const slideDurations = [3000,5000,4000];
+  const slideEffects = ["fade","slide-left","zoom"];
 
   const slider = document.getElementById("slider");
   let slides = [];
   let currentIndex = 0;
   let timeoutId;
 
-  // SVG dosyalarını fetch ile alıp inline ekle
-  svgFiles.forEach(async (file, i) => {
-    try {
-      const res = await fetch(file);
-      const svgText = await res.text();
-
-      const div = document.createElement("div");
-      div.classList.add("slide", slideEffects[i]);
-      div.innerHTML = svgText; // inline SVG ekleniyor
-      slider.appendChild(div);
-      slides.push(div);
-    } catch (err) {
-      console.error("SVG yüklenemedi:", file, err);
-    }
+  svgFiles.forEach((file, i) => {
+    const obj = document.createElement("object");
+    obj.data = file;
+    obj.type = "image/svg+xml";
+    obj.classList.add("slide", slideEffects[i]);
+    obj.style.width = "100%";
+    obj.style.height = "100%";
+    slider.appendChild(obj);
+    slides.push(obj);
   });
 
-  // Tüm slaytlar yüklendiğinde otomatik başlat
-  const waitForSlides = setInterval(() => {
-    if(slides.length === svgFiles.length){
-      clearInterval(waitForSlides);
-      showSlide(0);
-    }
-  }, 100);
-
   function showSlide(index){
-    slides.forEach((slide, i) => {
+    slides.forEach((slide,i)=>{
       slide.classList.remove("active");
-      if(i === index) slide.classList.add("active");
+      if(i===index) slide.classList.add("active");
     });
-
     currentIndex = index;
-
-    // Sonraki slaytı ayarla
     clearTimeout(timeoutId);
-    let next = currentIndex + 1;
-    if(next >= slides.length) next = 0;
-    timeoutId = setTimeout(() => showSlide(next), slideDurations[currentIndex]);
+    let next = currentIndex+1;
+    if(next>=slides.length) next=0;
+    timeoutId = setTimeout(()=>showSlide(next),slideDurations[currentIndex]);
   }
+
+  // Başlat
+  showSlide(0);
 </script>
 
 </body>
